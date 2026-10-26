@@ -1,0 +1,10 @@
+{
+  "name": "Mergerito",
+  "short_name": "Mergerito",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#030504",
+  "theme_color": "#030504",
+  "icons": [{ "src": "icona.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }]
+}
