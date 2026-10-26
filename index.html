@@ -41,8 +41,8 @@ header.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; b
 .brand::after { content: "_"; color: var(--green); animation: blink 1.1s steps(1) infinite; }
 @keyframes blink { 50% { opacity: 0 } }
 @media (prefers-reduced-motion: reduce) { .brand::after { animation: none } }
-.sub { font: 400 11.5px/1.3 var(--mono); color: var(--gray); margin-top: 4px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); flex: none; }
+.sub { font: 400 11.5px/1.35 var(--mono); color: var(--gray); margin-top: 4px; }
+.dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--green); margin-right: 6px; vertical-align: 1px; }
 .dot.warn { background: var(--amber); } .dot.err { background: var(--red); }
 .ref { margin-left: auto; width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--line2); background: var(--win); display: grid; place-items: center; }
 .ref svg { width: 18px; height: 18px; stroke: var(--green); }
@@ -308,10 +308,10 @@ function quanto(min) {
 // ---------------------------------------------------------------- giornate: Mac + TeamHB dal vivo
 function giornate() {
   const d = S.dati, L = S.live, oggi = oggiIso();
-  const ev = (d.eventi || []).filter((e) => (e.fine || e.data) >= oggi).map((e) => ({ ...e }));
+  const ev = (d.eventi || []).map((e) => ({ ...e }));
   if (L) {
     for (const e of ev) {
-      if (!e.stato_hb) continue;
+      if (!e.stato_hb || (e.fine || e.data) < oggi) continue;
       const giorni = [];
       for (let x = dt(e.data); x <= dt(e.fine || e.data); x.setDate(x.getDate() + 1)) giorni.push(`${x.getFullYear()}-${pad(x.getMonth() + 1)}-${pad(x.getDate())}`);
       const az = azienda(e.titolo);
@@ -410,7 +410,7 @@ function vistaCal() {
   const delGiorno = ev.filter((e) => e.data <= sel && sel <= (e.fine || e.data));
   const sd = dt(sel);
   h += `<h2>${["domenica", "lunedì", "martedì", "mercoledì", "giovedì", "venerdì", "sabato"][sd.getDay()]} ${sd.getDate()} ${MESI[sd.getMonth()]}${sel === oggi ? " · oggi" : ""}</h2>`;
-  h += delGiorno.length ? `<div class="list">${delGiorno.map((e) => rigaEvento(d, e, oggi)).join("")}</div>` : `<div class="vuoto">${sel < oggi ? "Giorno passato: il calendario mostra da oggi in poi." : "Libero."}</div>`;
+  h += delGiorno.length ? `<div class="list">${delGiorno.map((e) => rigaEvento(d, e, oggi)).join("")}</div>` : `<div class="vuoto">${sel < oggi ? "Niente in questo giorno." : "Libero."}</div>`;
   return h;
 }
 
@@ -461,7 +461,9 @@ function vistaCons() {
 function vistaStato() {
   const d = S.dati, st = d.stato || {}, L = S.live;
   const fonti = st.fonti || {};
-  let h = `<h2>Ultimo sync del Mac</h2><dl class="kv"><dt>quando</dt><dd>${esc(st.quando || "—")} · ${quanto(eta(st.quando))}</dd>`;
+  let h = `<h2>Calendario iCloud dall'iPhone</h2><a class="btn prim wide" style="display:grid;place-items:center;text-decoration:none" href="scriptable:///run/Mergerito%20Sync">AGGIORNA IL CALENDARIO ORA</a>
+    <p class="nota">Fa partire lo script "Mergerito Sync" in Scriptable: legge TeamHB e aggiorna il calendario Mergerito anche col Mac spento. ShiftSync lo aggiorna il Mac.</p>
+    <h2>Ultimo sync del Mac</h2><dl class="kv"><dt>quando</dt><dd>${esc(st.quando || "—")} · ${quanto(eta(st.quando))}</dd>`;
   for (const [n, f] of Object.entries(fonti)) h += `<dt>${esc(n)}</dt><dd style="color:${f.ok ? "var(--green)" : "var(--red)"}">${f.ok ? "OK" : "ERRORE"} · ${f.eventi} giornate</dd>`;
   if (d.shiftsync && d.shiftsync.errore) h += `<dt>ShiftSync</dt><dd style="color:var(--amber)">${esc(d.shiftsync.errore)}</dd>`;
   h += `<dt>dati caricati</dt><dd>${esc(d.quando || "—")}</dd><dt>versione</dt><dd>Mergerito ${esc(d.versione || "")}</dd></dl>`;
@@ -525,12 +527,22 @@ function disegna() {
 }
 
 // ---------------------------------------------------------------- caricamento
-async function carica() {
+/** versione della pagina, scritta dal Mac quando la carica su GitHub */
+const PAGINA = "7.5.0";
+
+/** silenzioso = controllo automatico: niente rotellina, ridisegna solo se è cambiato qualcosa */
+async function carica(silenzioso) {
   if (S.carico || !S.frase) return;
-  S.carico = true; disegna();
+  S.carico = !silenzioso; if (!silenzioso) disegna();
+  let cambiato = !silenzioso;
   try {
     const testo = await scaricaDati();
-    S.dati = await decifra(S.frase, testo);
+    if (testo !== S._testo) { S.dati = await decifra(S.frase, testo); S._testo = testo; cambiato = true; }
+    // pagina nuova su GitHub: la ricarico da sola (al massimo ogni 5 minuti, GitHub Pages ci mette un po')
+    if (S.dati.versione && !PAGINA.startsWith("__") && S.dati.versione !== PAGINA) {
+      let t = 0; try { t = +sessionStorage.getItem("mg_ricarica") || 0; } catch {}
+      if (Date.now() - t > 300000) { try { sessionStorage.setItem("mg_ricarica", Date.now()); } catch {} location.reload(); return; }
+    }
     S.letto = new Date();
     set(K.cache, testo);
     S.errore = "";
@@ -543,10 +555,14 @@ async function carica() {
     if (/token GitHub non valido/.test(e.message)) set(K.token, "");
     else if (!S.dati && get(K.cache)) { try { S.dati = await decifra(S.frase, get(K.cache)); } catch {} }
   }
-  if (S.dati && getJ(K.hb, null)) {
-    try { S.live = await hbLeggi(S.dati); S.liveErr = ""; } catch (e) { S.liveErr = e.message; }
+  // TeamHB dal telefono: a ogni aggiornamento a mano, in automatico ogni 5 minuti
+  if (S.dati && getJ(K.hb, null) && (!silenzioso || Date.now() - (S._hb || 0) > 300000)) {
+    const prima = JSON.stringify(S.live && { ...S.live, quando: 0 });
+    try { S.live = await hbLeggi(S.dati); S.liveErr = ""; S._hb = Date.now(); } catch (e) { S.liveErr = e.message; }
+    if (JSON.stringify(S.live && { ...S.live, quando: 0 }) !== prima) cambiato = true;
   }
-  S.carico = false; disegna();
+  S.carico = false;
+  if (cambiato || !silenzioso) disegna();
 }
 
 async function inviaScelte() {
@@ -593,7 +609,7 @@ document.addEventListener("click", (ev) => {
   if (b.dataset.viaggio) { const id = b.dataset.viaggio, k = b.dataset.scelta; if (S.scelte[id] === k) delete S.scelte[id]; else S.scelte[id] = k; S.invio = ""; disegna(); return; }
   if (b.id === "invia") return inviaScelte();
   if (b.id === "hb-esci") { set(K.hb, ""); S.live = null; S.liveErr = ""; disegna(); return; }
-  if (b.id === "blocca") { S.frase = ""; set(K.frase, ""); S.dati = null; S.live = null; disegna(); return; }
+  if (b.id === "blocca") { S.frase = ""; set(K.frase, ""); S.dati = null; S._testo = null; S.live = null; disegna(); return; }
 });
 document.addEventListener("submit", async (ev) => {
   ev.preventDefault();
@@ -605,7 +621,7 @@ document.addEventListener("submit", async (ev) => {
     if (fr) { S.frase = fr; set(K.frase, fr); }
     if (tk) set(K.token, tk);
     S.errore = "";
-    if (S.frase && get(K.token)) { S.dati = null; disegna(); carica(); } else { S.errore = !S.frase ? "scrivi la frase segreta" : "scrivi il token GitHub"; disegna(); }
+    if (S.frase && get(K.token)) { S.dati = null; S._testo = null; disegna(); carica(); } else { S.errore = !S.frase ? "scrivi la frase segreta" : "scrivi il token GitHub"; disegna(); }
   } else if (f.id === "hb-form") {
     try { await hbLogin(S.dati, document.getElementById("hb-email").value.trim(), document.getElementById("hb-pw").value); S.liveErr = ""; carica(); }
     catch (e) { S.liveErr = e.message; disegna(); }
@@ -614,7 +630,9 @@ document.addEventListener("submit", async (ev) => {
     if (v) { set(K.token, v); disegna(); }
   }
 });
-document.addEventListener("visibilitychange", () => { if (!document.hidden && S.dati && Date.now() - (S._ultimo || 0) > 60000) { S._ultimo = Date.now(); carica(); } });
+// si aggiorna da sola: appena torni sull'app e poi ogni minuto mentre è aperta
+document.addEventListener("visibilitychange", () => { if (!document.hidden && S.dati) carica(true); });
+setInterval(() => { if (!document.hidden && S.dati) carica(true); }, 60000);
 
 (async function avvio() {
   if (S.frase && get(K.cache)) { try { S.dati = await decifra(S.frase, get(K.cache)); } catch {} }
