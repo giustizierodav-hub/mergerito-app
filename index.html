@@ -23,6 +23,7 @@
   --sans: -apple-system, system-ui, "Helvetica Neue", sans-serif;
   color-scheme: dark;
 }
+[hidden] { display: none !important; }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html { padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px); background: var(--bg); }
 body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.45 var(--sans); min-height: 100vh;
@@ -76,6 +77,38 @@ h2::before { content: "// "; color: var(--line2); }
 .tag.nuova { color: var(--amber); border-color: #5a4512; }
 .vuoto { color: var(--dim); font: 13px/1.5 var(--mono); padding: 18px 12px; }
 
+
+/* calendario mensile */
+.mesebar { display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; margin: 14px 0 8px; }
+.freccia { height: 44px; border-radius: 10px; border: 1px solid var(--line2); background: var(--win); color: var(--green); font: 400 26px/1 var(--mono); }
+.mtit { background: none; border: 0; font: 700 15px/1 var(--mono); color: var(--bright); text-transform: uppercase; letter-spacing: .12em; }
+.mtit span { color: var(--green); }
+.griglia { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--card); }
+.gg, .sett { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
+.gg span { font: 600 10px/1 var(--mono); color: var(--dim); text-align: center; padding: 8px 0; letter-spacing: .08em; border-bottom: 1px solid var(--line); }
+.gg span.we { color: var(--gray); }
+.cella { min-height: var(--alt, 57px); background: none; border: 0; border-right: 1px solid #0d1511; border-bottom: 1px solid #0d1511; padding: 4px 0 4px; text-align: left; display: flex; flex-direction: column; gap: 2px; min-width: 0; color: var(--text); }
+.sett .cella:nth-child(7) { border-right: 0; }
+.cella.we { background: rgba(255,255,255,.012); }
+.cella .num { font: 600 12px/1 var(--mono); color: var(--text); padding: 3px 0 3px 6px; font-variant-numeric: tabular-nums; }
+.cella.fuori .num { color: #37443d; }
+.cella.passato .num { color: var(--dim); }
+.cella.oggi { background: rgba(61, 255, 143, .16); }
+.cella.oggi .num { color: var(--bg); background: var(--green); border-radius: 5px; padding: 3px 5px; margin-left: 3px; align-self: flex-start; }
+.cella.sel { box-shadow: inset 0 0 0 1.5px var(--green); }
+.cella.sel:not(.oggi) { background: var(--sel); }
+.sett { position: relative; }
+.barra { position: absolute; height: 25px; padding: 0 3px; font: 600 8.5px/1 var(--mono); letter-spacing: -.03em; color: var(--c); background: color-mix(in srgb, var(--c) 17%, transparent); overflow: hidden; pointer-events: none; display: flex; align-items: center; gap: 3px; }
+.barra b { font-weight: 600; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.barra.uno { padding: 0 2px; }
+.barra.uno b { white-space: normal; line-height: 10.5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow-wrap: normal; word-break: normal; }
+.barra.uno .sq { position: absolute; top: 2px; right: 2px; }
+.barra.a { border-left: 2px solid var(--c); border-top-left-radius: 4px; border-bottom-left-radius: 4px; }
+.barra.b { border-top-right-radius: 4px; border-bottom-right-radius: 4px; }
+.barra .sq { flex: none; width: 6px; height: 6px; border-radius: 1.5px; }
+.altri { font: 600 9px/1 var(--mono); color: var(--gray); padding-left: 6px; margin-top: auto; }
+
+
 /* viaggi */
 .card { border: 1px solid var(--line); background: var(--card); border-radius: 10px; padding: 12px; display: grid; gap: 10px; }
 .cards { display: grid; gap: 10px; }
@@ -126,7 +159,7 @@ h2::before { content: "// "; color: var(--line2); }
 
 /* barra in basso */
 nav.bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 6; background: rgba(3,5,4,.94); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-  border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(4, 1fr);
+  border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(3, 1fr);
   padding: 6px max(8px, env(safe-area-inset-right, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px)); }
 nav.bar button { background: none; border: 0; min-height: 50px; font: 600 10px/1 var(--mono); letter-spacing: .08em; color: var(--dim); display: grid; justify-items: center; gap: 6px; position: relative; }
 nav.bar button svg { width: 21px; height: 21px; stroke: currentColor; fill: none; stroke-width: 1.7; }
@@ -138,7 +171,6 @@ nav.bar .badge { position: absolute; top: 3px; left: calc(50% + 6px); min-width:
 <div class="wrap" id="app"></div>
 <nav class="bar" id="bar" hidden>
   <button data-v="cal" aria-current="page"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>CALENDARIO</button>
-  <button data-v="viaggi"><svg viewBox="0 0 24 24"><path d="M4 17l6-10 4 6 2-3 4 7z"/></svg>VIAGGI<span class="badge" id="bv" hidden></span></button>
   <button data-v="cons"><svg viewBox="0 0 24 24"><path d="M6 3.5h9l3 3V20.5H6z"/><path d="M9 11h6M9 15h6"/></svg>CONSUNTIVI<span class="badge" id="bc" hidden></span></button>
   <button data-v="stato"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2.8v3M12 18.2v3M2.8 12h3M18.2 12h3M5.5 5.5l2.1 2.1M16.4 16.4l2.1 2.1M5.5 18.5l2.1-2.1M16.4 7.6l2.1-2.1"/></svg>STATO</button>
 </nav>
@@ -300,6 +332,32 @@ function giornate() {
 }
 
 // ---------------------------------------------------------------- viste
+function rigaEvento(d, e, oggi) {
+  const a = dt(e.data), multi = e.fine && e.fine !== e.data;
+  const quando = multi ? `${ddmm(e.data)}<br>→ ${ddmm(e.fine)}` : `<span class="wd">${GG[a.getDay()]}</span>${ddmm(e.data)}`;
+  const az = azienda(e.titolo), resto = String(e.titolo).slice(az.length).replace(/^ · /, "");
+  const viaggio = /^viaggio\b/i.test(az);
+  const sq = viaggio ? `<span class="sq viaggio" title="viaggio"></span>` : e.stato_hb ? `<span class="sq ${e.stato_hb}" title="${({ in_calendario: "in calendario TeamHB", richiesta: "agibilità richiesta", mancante: "né in calendario né richiesta" })[e.stato_hb]}"></span>` : "";
+  const fonti = (e.fonti || []).join("+");
+  const luogo = e.luogo ? esc(e.luogo) : "";
+  return `<div class="row"><div class="when">${quando}</div><div class="what">
+    <div class="tit">${sq}<span class="az" style="color:${colore(d, az)}">${esc(az)}</span>${resto ? `<span class="resto">· ${esc(resto)}</span>` : ""}</div>
+    <div class="meta">${fonti ? `<span class="tag">${esc(fonti)}</span>` : ""}${e.nuova ? `<span class="tag nuova">NUOVA SU TEAMHB</span>` : ""}${e.live ? `<span class="tag live">AGGIORNATO ORA</span>` : ""}${luogo ? `<span>${luogo}</span>` : ""}</div>
+  </div></div>`;
+}
+/** "Hollywood Service Italia S.r.l." → "Hollywood Service Italia" */
+const corto = (n) => String(n).replace(/[\s,]*(s\.?\s?r\.?\s?l\.?s?|s\.?\s?p\.?\s?a\.?|s\.?n\.?c\.?|s\.?a\.?s\.?)\s*$/i, "").trim();
+/** seconda casella di un lavoro di più giorni: tour/artista dalle note, altrimenti la città o il posto */
+function info(e) {
+  const n = String(e.note || "");
+  const m = n.match(/(?:Artista \/ evento|Tour|Produzione|Evento):\s*([^\n]+)/i);
+  if (m) return m[1].trim();
+  const resto = String(e.titolo).split(" · ").slice(1).join(" · ");
+  return resto || String(e.luogo || "").split(",")[0];
+}
+const iso = (x) => `${x.getFullYear()}-${pad(x.getMonth() + 1)}-${pad(x.getDate())}`;
+const GGL = ["L", "M", "M", "G", "V", "S", "D"];
+
 function vistaCal() {
   const d = S.dati, L = S.live, oggi = oggiIso();
   let h = "";
@@ -307,26 +365,53 @@ function vistaCal() {
     h += `<div class="banner warn"><div><b>${L.da_rispondere.length === 1 ? "1 chiamata da accettare" : L.da_rispondere.length + " chiamate da accettare"} su TeamHB</b><br>${L.da_rispondere.map((c) => `${ddmm(c.data)} ${esc(c.azienda)}`).join(" · ")}</div></div>`;
   }
   const ev = giornate();
-  if (!ev.length) return h + `<div class="vuoto">Nessun impegno in arrivo.</div>`;
-  h += `<h2>Prossimi impegni</h2><div class="list">`;
-  let mese = "";
-  for (const e of ev) {
-    const m = e.data.slice(0, 7);
-    if (m !== mese) { mese = m; h += `<div class="mese">${MESI[+m.slice(5) - 1]} ${m.slice(0, 4)}</div>`; }
-    const a = dt(e.data), multi = e.fine && e.fine !== e.data;
-    const quando = multi ? `${ddmm(e.data)}<br>→ ${ddmm(e.fine)}` : `<span class="wd">${GG[a.getDay()]}</span>${ddmm(e.data)}`;
-    const az = azienda(e.titolo), resto = String(e.titolo).slice(az.length).replace(/^ · /, "");
-    const viaggio = /^viaggio\b/i.test(az);
-    const sq = viaggio ? `<span class="sq viaggio" title="viaggio"></span>` : e.stato_hb ? `<span class="sq ${e.stato_hb}" title="${({ in_calendario: "in calendario TeamHB", richiesta: "agibilità richiesta", mancante: "né in calendario né richiesta" })[e.stato_hb]}"></span>` : "";
-    const oggiQui = e.data <= oggi && oggi <= (e.fine || e.data);
-    const fonti = (e.fonti || []).join("+");
-    const luogo = e.luogo ? esc(e.luogo) : "";
-    h += `<div class="row${oggiQui ? " oggi" : ""}"><div class="when">${quando}</div><div class="what">
-      <div class="tit">${sq}<span class="az" style="color:${colore(d, az)}">${esc(az)}</span>${resto ? `<span class="resto">· ${esc(resto)}</span>` : ""}</div>
-      <div class="meta">${fonti ? `<span class="tag">${esc(fonti)}</span>` : ""}${e.nuova ? `<span class="tag nuova">NUOVA SU TEAMHB</span>` : ""}${e.live ? `<span class="tag live">AGGIORNATO ORA</span>` : ""}${luogo ? `<span>${luogo}</span>` : ""}${e.note && e.nuova ? `<span>${esc(e.note)}</span>` : ""}</div>
-    </div></div>`;
+  const mese = S.mese || oggi.slice(0, 7);
+  const [Y, M] = mese.split("-").map(Number);
+  const primo = new Date(Y, M - 1, 1, 12);
+  const inizio = new Date(primo); inizio.setDate(1 - ((primo.getDay() + 6) % 7)); // lunedì
+  const giorni = new Date(Y, M, 0).getDate();
+  const settimane = Math.ceil((((primo.getDay() + 6) % 7) + giorni) / 7);
+  const sel = S.giorno && S.giorno.startsWith(mese) ? S.giorno : (oggi.startsWith(mese) ? oggi : `${mese}-01`);
+  h += `<div class="mesebar"><button class="freccia" data-mese="-1" aria-label="Mese prima">‹</button>
+    <button class="mtit" data-mese="0">${MESI[M - 1]} <span>${Y}</span></button>
+    <button class="freccia" data-mese="1" aria-label="Mese dopo">›</button></div>
+    <div class="griglia"><div class="gg">${GGL.map((g, i) => `<span${i > 4 ? ' class="we"' : ""}>${g}</span>`).join("")}</div>`;
+  const x = new Date(inizio);
+  for (let w = 0; w < settimane; w++) {
+    const g0 = iso(x), g6 = iso(new Date(x.getTime() + 6 * 864e5));
+    // lavori di questa settimana, ognuno su una corsia: un'unica barra anche su più giorni
+    const pezzi = ev.filter((e) => e.data <= g6 && (e.fine || e.data) >= g0)
+      .map((e) => ({ e, c0: Math.max(0, Math.round((dt(e.data) - dt(g0)) / 864e5)), c1: Math.min(6, Math.round((dt(e.fine || e.data) - dt(g0)) / 864e5)) }))
+      .sort((p, q) => p.c0 - q.c0 || (q.c1 - q.c0) - (p.c1 - p.c0));
+    const corsie = [];
+    for (const p of pezzi) { let l = corsie.findIndex((fine) => fine < p.c0); if (l < 0) { l = corsie.length; corsie.push(-1); } corsie[l] = p.c1; p.l = l; }
+    const nascosti = Array(7).fill(0);
+    let barre = "";
+    for (const p of pezzi) {
+      if (p.l > 2) { for (let c = p.c0; c <= p.c1; c++) nascosti[c]++; continue; }
+      const e = p.e, az = azienda(e.titolo), viaggio = /^viaggio\b/i.test(az);
+      const st = viaggio ? "viaggio" : e.stato_hb || "";
+      const lungo = p.c1 > p.c0, inf = viaggio ? "" : info(e);
+      const testo = viaggio ? "Viaggio" : lungo && inf ? `${corto(az)} · ${inf}` : corto(az);
+      const apre = e.data >= g0, chiude = (e.fine || e.data) <= g6;
+      barre += `<span class="barra${apre ? " a" : ""}${chiude ? " b" : ""}${lungo ? "" : " uno"}" style="--c:${colore(d, az)};left:calc(${p.c0} * 100% / 7 + 2px);width:calc(${p.c1 - p.c0 + 1} * 100% / 7 - 4px);top:calc(24px + ${p.l} * 27px)">${st ? `<i class="sq ${st}"></i>` : ""}<b>${esc(testo)}</b></span>`;
+    }
+    const righe = Math.max(1, Math.min(3, corsie.length));
+    h += `<div class="sett" style="--alt:${30 + righe * 27}px">`;
+    for (let i = 0; i < 7; i++) {
+      const g = iso(x), fuori = x.getMonth() !== M - 1;
+      const cls = ["cella", fuori ? "fuori" : "", g === oggi ? "oggi" : "", g === sel ? "sel" : "", i > 4 ? "we" : "", g < oggi ? "passato" : ""].filter(Boolean).join(" ");
+      h += `<button class="${cls}" data-giorno="${g}"><span class="num">${x.getDate()}</span>${nascosti[i] ? `<span class="altri">+${nascosti[i]}</span>` : ""}</button>`;
+      x.setDate(x.getDate() + 1);
+    }
+    h += `${barre}</div>`;
   }
-  return h + `</div>`;
+  h += `</div>`;
+  const delGiorno = ev.filter((e) => e.data <= sel && sel <= (e.fine || e.data));
+  const sd = dt(sel);
+  h += `<h2>${["domenica", "lunedì", "martedì", "mercoledì", "giovedì", "venerdì", "sabato"][sd.getDay()]} ${sd.getDate()} ${MESI[sd.getMonth()]}${sel === oggi ? " · oggi" : ""}</h2>`;
+  h += delGiorno.length ? `<div class="list">${delGiorno.map((e) => rigaEvento(d, e, oggi)).join("")}</div>` : `<div class="vuoto">${sel < oggi ? "Giorno passato: il calendario mostra da oggi in poi." : "Libero."}</div>`;
+  return h;
 }
 
 function inAttesa() { return getJ(K.attesa, []); }
@@ -365,25 +450,11 @@ function vistaViaggi() {
 }
 
 function vistaCons() {
-  const d = S.dati, c = d.consuntivo_mx || { righe: [] };
-  let h = `<h2>Mister X · ${MESI[(c.mese || 1) - 1]} ${c.anno || ""}</h2>`;
-  if (!c.righe.length) h += `<div class="vuoto">Nessuna giornata Mister X su TeamHB in questo mese.</div>`;
-  else {
-    h += `<div class="scroll"><table class="tab"><thead><tr><th>Data</th><th>Giornata</th><th class="n">Spese</th><th class="n">Diaria</th><th class="n">Paga</th></tr></thead><tbody>`;
-    for (const r of c.righe) {
-      const paga = (parseFloat(String(r.paga).replace(",", ".")) || 0) + (parseFloat(String(r.extra).replace(",", ".")) || 0);
-      const loc = [r.produzione, r.location].filter(Boolean).join(" - ");
-      h += `<tr><td class="d">${ddmm(r.data)}</td><td><div class="dsc">${esc(r.descrizione || "—")}</div>${loc ? `<div class="loc">${esc(loc)}</div>` : ""}</td><td class="n">${esc(r.spese || "")}</td><td class="n">${esc(r.diaria || "")}</td><td class="n">${paga ? euro(paga) : ""}</td></tr>`;
-    }
-    h += `</tbody></table></div>`;
-    const t = c.totali || {};
-    h += `<div class="tot"><div><small>Spese</small><b>${euro(t.spese || 0)}</b></div><div><small>Diaria</small><b>${euro(t.diaria || 0)}</b></div><div><small>Paga</small><b>${euro(t.paga || 0)}</b></div><div><small>Totale €</small><b>${euro(t.generale || 0)}</b></div></div>`;
-    h += `<p class="nota">Valori come nell'app del Mac. L'Excel si crea dal Mac.</p>`;
-  }
-  const hb = d.hb_da_fare || [];
-  h += `<h2>HBONE · consuntivi da fare</h2>`;
-  if (!hb.length) h += `<div class="vuoto">Tutti i consuntivi sono su TeamHB.</div>`;
-  else h += `<div class="list">` + hb.map((x) => `<div class="row"><div class="when"><span class="wd">${GG[dt(x.data).getDay()]}</span>${ddmm(x.data)}</div><div class="what"><div class="tit"><span class="az" style="color:${colore(d, x.azienda)}">${esc(x.azienda)}</span></div>${x.chiusura_mx ? `<div class="meta">chiusura del mese con i totali</div>` : ""}</div></div>`).join("") + `</div><p class="nota">Si compilano dal Mac (CONSUNTIVO HBONE).</p>`;
+  const d = S.dati, hb = d.hb_da_fare || [];
+  let h = `<h2>Consuntivi da inserire</h2>`;
+  if (!hb.length) return h + `<div class="banner ok"><div>Tutto inserito su TeamHB.</div></div>`;
+  h += `<p class="nota" style="margin:0 0 6px">${hb.length === 1 ? "1 giornata" : hb.length + " giornate"} senza consuntivo su TeamHB. Li compili dal Mac (CONSUNTIVO HBONE).</p>`;
+  h += `<div class="list">` + hb.map((x) => `<div class="row"><div class="when"><span class="wd">${GG[dt(x.data).getDay()]}</span>${ddmm(x.data)}</div><div class="what"><div class="tit"><span class="az" style="color:${colore(d, x.azienda)}">${esc(corto(x.azienda))}</span></div>${x.chiusura_mx ? `<div class="meta">ultima Mister X del mese: va chiusa con i totali del report</div>` : ""}</div></div>`).join("") + `</div>`;
   return h;
 }
 
@@ -405,7 +476,7 @@ function vistaStato() {
       <button class="btn prim wide" type="submit">ENTRA IN TEAMHB</button>${S.liveErr ? `<div class="banner err"><div>${esc(S.liveErr)}</div></div>` : ""}</form>`;
   }
 
-  h += `<h2>Scelte verso il Mac</h2><form id="tok-form" class="cards"><div class="campo"><label for="tok">Token GitHub</label><input id="tok" type="password" autocomplete="off" placeholder="${get(K.token) ? "salvato su questo telefono" : "github_pat_…"}"><span class="aiuto">Lo stesso inserito nel Mac: serve per leggere i dati e mandare le scelte.</span></div><button class="btn wide" type="submit">${get(K.token) ? "CAMBIA TOKEN" : "SALVA TOKEN"}</button></form>`;
+  h += `<h2>Accesso ai dati</h2><form id="tok-form" class="cards"><div class="campo"><label for="tok">Token GitHub</label><input id="tok" type="password" autocomplete="off" placeholder="${get(K.token) ? "salvato su questo telefono" : "github_pat_…"}"><span class="aiuto">Lo stesso inserito nel Mac.</span></div><button class="btn wide" type="submit">${get(K.token) ? "CAMBIA TOKEN" : "SALVA TOKEN"}</button></form>`;
   const es = (d.esiti || []).slice(-5).reverse();
   if (es.length) h += `<dl class="kv" style="margin-top:12px">` + es.map((e) => `<dt>${esc(e.quando)}</dt><dd style="color:${e.ok ? "var(--green)" : "var(--red)"}">${e.ok ? "eseguita" : esc(e.errore)}</dd>`).join("") + `</dl>`;
 
@@ -420,7 +491,7 @@ function intestazione() {
   const cls = !d ? "warn" : min > 120 ? "warn" : d.stato && d.stato.ok === false ? "err" : "";
   const live = S.live && !S.liveErr ? " · TeamHB dal vivo" : "";
   return `<header class="top"><img class="logo" src="icona.png" alt="">
-    <div><div class="brand">Mergerito</div><div class="sub"><span class="dot ${cls}"></span>${d ? `Mac ${quanto(min)}${live}` : "…"}</div></div>
+    <div><div class="brand">Mergerito</div><div class="sub"><span class="dot ${cls}"></span>${d ? `Mac ${quanto(min)}${live}${S.letto ? ` · letto ${pad(S.letto.getHours())}:${pad(S.letto.getMinutes())}` : ""}` : "…"}</div></div>
     <button class="ref${S.carico ? " spin" : ""}" id="ref" aria-label="Aggiorna"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg></button></header>`;
 }
 
@@ -444,12 +515,11 @@ function disegna() {
   const min = eta(S.dati.stato && S.dati.stato.quando);
   if (min > 120) h += `<div class="banner warn"><div>Il Mac non sincronizza da ${quanto(min).replace(" fa", "")}: ShiftSync e viaggi sono fermi a quell'ora.${S.live ? " TeamHB è aggiornato dal telefono." : ""}</div></div>`;
   if (S.liveErr && S.vista !== "stato") h += `<div class="banner warn"><div>TeamHB dal telefono: ${esc(S.liveErr)}</div></div>`;
-  h += { cal: vistaCal, viaggi: vistaViaggi, cons: vistaCons, stato: vistaStato }[S.vista]();
+  if (!["cal", "cons", "stato"].includes(S.vista)) S.vista = "cal";
+  h += { cal: vistaCal, cons: vistaCons, stato: vistaStato }[S.vista]();
   app.innerHTML = h;
   bar.hidden = false;
   bar.querySelectorAll("button").forEach((b) => b.setAttribute("aria-current", b.dataset.v === S.vista ? "page" : "false"));
-  const nv = (S.dati.viaggi || []).filter((v) => !v.scelta && v.tipo !== "stesso_giorno" && v.data >= oggiIso() && !inAttesa().some((a) => a.viaggio === v.id)).length;
-  const bv = document.getElementById("bv"); bv.hidden = !nv; bv.textContent = nv;
   const nc = (S.dati.hb_da_fare || []).length;
   const bc = document.getElementById("bc"); bc.hidden = !nc; bc.textContent = nc;
 }
@@ -461,6 +531,7 @@ async function carica() {
   try {
     const testo = await scaricaDati();
     S.dati = await decifra(S.frase, testo);
+    S.letto = new Date();
     set(K.cache, testo);
     S.errore = "";
     // scelte già eseguite dal Mac: tolte dall'attesa
@@ -513,6 +584,12 @@ document.addEventListener("click", (ev) => {
   const b = ev.target.closest("button"); if (!b) return;
   if (b.dataset.v) { S.vista = b.dataset.v; set(K.vista, S.vista); S.invio = ""; disegna(); scrollTo(0, 0); return; }
   if (b.id === "ref") return carica();
+  if (b.dataset.mese !== undefined) {
+    const oggi = oggiIso(), [y, m] = (S.mese || oggi.slice(0, 7)).split("-").map(Number), k = +b.dataset.mese;
+    const n = k === 0 ? new Date() : new Date(y, m - 1 + k, 1);
+    S.mese = `${n.getFullYear()}-${pad(n.getMonth() + 1)}`; S.giorno = k === 0 ? oggi : ""; disegna(); return;
+  }
+  if (b.dataset.giorno) { S.giorno = b.dataset.giorno; const m = S.giorno.slice(0, 7); if (m !== (S.mese || oggiIso().slice(0, 7))) S.mese = m; disegna(); return; }
   if (b.dataset.viaggio) { const id = b.dataset.viaggio, k = b.dataset.scelta; if (S.scelte[id] === k) delete S.scelte[id]; else S.scelte[id] = k; S.invio = ""; disegna(); return; }
   if (b.id === "invia") return inviaScelte();
   if (b.id === "hb-esci") { set(K.hb, ""); S.live = null; S.liveErr = ""; disegna(); return; }
