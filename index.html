@@ -18,7 +18,7 @@
 :root {
   --bg: #030504; --win: #080c0a; --card: #060a08; --line: #1b2a22; --line2: #22362b;
   --text: #d3ded7; --bright: #e6efe9; --gray: #8a968f; --dim: #6e7d74;
-  --green: #3dff8f; --amber: #f5a524; --red: #ff6b5e; --viola: #b784ff; --sel: #0a1610;
+  --green: #3dff8f; --amber: #f5a524; --arancio: #ff9f43; --red: #ff6b5e; --viola: #b784ff; --sel: #0a1610;
   --mono: "Martian Mono", ui-monospace, "SF Mono", Menlo, monospace;
   --sans: -apple-system, system-ui, "Helvetica Neue", sans-serif;
   color-scheme: dark;
@@ -93,8 +93,8 @@ h2::before { content: "// "; color: var(--line2); }
 .cella .num { font: 600 12px/1 var(--mono); color: var(--text); padding: 3px 0 3px 6px; font-variant-numeric: tabular-nums; }
 .cella.fuori .num { color: #37443d; }
 .cella.passato .num { color: var(--dim); }
-.cella.oggi { background: rgba(61, 255, 143, .16); }
-.cella.oggi .num { color: var(--bg); background: var(--green); border-radius: 5px; padding: 3px 5px; margin-left: 3px; align-self: flex-start; }
+.cella.oggi { background: rgba(255, 159, 67, .2); }
+.cella.oggi .num { color: var(--bg); background: var(--arancio); border-radius: 5px; padding: 3px 5px; margin-left: 3px; align-self: flex-start; }
 .cella.sel { box-shadow: inset 0 0 0 1.5px var(--green); }
 .cella.sel:not(.oggi) { background: var(--sel); }
 .sett { position: relative; }
@@ -528,7 +528,7 @@ function disegna() {
 
 // ---------------------------------------------------------------- caricamento
 /** versione della pagina, scritta dal Mac quando la carica su GitHub */
-const PAGINA = "7.5.1";
+const PAGINA = "7.5.3";
 
 /** silenzioso = controllo automatico: niente rotellina, ridisegna solo se è cambiato qualcosa */
 async function carica(silenzioso) {
