@@ -63,11 +63,11 @@ h2::before { content: "// "; color: var(--line2); }
 .mese { font: 600 11px/1 var(--mono); color: var(--gray); letter-spacing: .12em; text-transform: uppercase; padding: 16px 0 6px 12px; }
 .row { display: grid; grid-template-columns: 76px 1fr; gap: 10px; padding: 9px 0 9px 12px; border-bottom: 1px solid #0d1511; position: relative; }
 .row.oggi::before { content: ""; position: absolute; left: -2px; top: 0; bottom: 0; width: 2px; background: var(--green); }
-.when { font: 600 12px/1.35 var(--mono); color: var(--gray); font-variant-numeric: tabular-nums; }
+.when { font: 600 13px/1.35 var(--sans); color: var(--gray); font-variant-numeric: tabular-nums; }
 .when .wd { color: var(--dim); font-weight: 400; display: block; font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; }
 .what { min-width: 0; }
 .tit { display: flex; align-items: center; gap: 7px; font-weight: 600; color: var(--bright); line-height: 1.3; }
-.tit .az { font-family: var(--mono); font-weight: 600; font-size: 14px; }
+.tit .az { font-family: var(--sans); font-weight: 700; font-size: 16px; }
 .tit .resto { color: var(--bright); font-weight: 500; overflow-wrap: anywhere; }
 .sq { width: 11px; height: 11px; border-radius: 2.5px; flex: none; }
 .sq.in_calendario { background: var(--green); } .sq.richiesta { background: var(--amber); } .sq.mancante { background: var(--red); } .sq.viaggio { background: var(--viola); }
@@ -85,12 +85,12 @@ h2::before { content: "// "; color: var(--line2); }
 .mtit span { color: var(--green); }
 .griglia { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--card); }
 .gg, .sett { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
-.gg span { font: 600 10px/1 var(--mono); color: var(--dim); text-align: center; padding: 8px 0; letter-spacing: .08em; border-bottom: 1px solid var(--line); }
+.gg span { font: 700 11.5px/1 var(--sans); color: var(--dim); text-align: center; padding: 8px 0; letter-spacing: .08em; border-bottom: 1px solid var(--line); }
 .gg span.we { color: var(--gray); }
 .cella { min-height: var(--alt, 57px); background: none; border: 0; border-right: 1px solid #0d1511; border-bottom: 1px solid #0d1511; padding: 4px 0 4px; text-align: left; display: flex; flex-direction: column; gap: 2px; min-width: 0; color: var(--text); }
 .sett .cella:nth-child(7) { border-right: 0; }
 .cella.we { background: rgba(255,255,255,.012); }
-.cella .num { font: 600 12px/1 var(--mono); color: var(--text); padding: 3px 0 3px 6px; font-variant-numeric: tabular-nums; }
+.cella .num { font: 700 13px/1 var(--sans); color: var(--text); padding: 3px 0 3px 6px; font-variant-numeric: tabular-nums; }
 .cella.fuori .num { color: #37443d; }
 .cella.passato .num { color: var(--dim); }
 .cella.oggi { background: rgba(255, 159, 67, .2); }
@@ -98,14 +98,16 @@ h2::before { content: "// "; color: var(--line2); }
 .cella.sel { box-shadow: inset 0 0 0 1.5px var(--green); }
 .cella.sel:not(.oggi) { background: var(--sel); }
 .sett { position: relative; }
-.barra { position: absolute; height: 25px; padding: 0 3px; font: 600 8.5px/1 var(--mono); letter-spacing: -.03em; color: var(--c); background: color-mix(in srgb, var(--c) 17%, transparent); overflow: hidden; pointer-events: none; display: flex; align-items: center; gap: 3px; }
+.barra { position: absolute; height: 25px; padding: 0 4px; font: 600 11px/1 var(--sans); letter-spacing: -.01em; color: var(--tc, #0b0f0d); background: var(--c); overflow: hidden; pointer-events: none; display: flex; align-items: center; gap: 4px; border-radius: 0; }
 .barra b { font-weight: 600; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-.barra.uno { padding: 0 2px; }
-.barra.uno b { white-space: normal; line-height: 10.5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow-wrap: normal; word-break: normal; }
-.barra.uno .sq { position: absolute; top: 2px; right: 2px; }
-.barra.a { border-left: 2px solid var(--c); border-top-left-radius: 4px; border-bottom-left-radius: 4px; }
-.barra.b { border-top-right-radius: 4px; border-bottom-right-radius: 4px; }
-.barra .sq { flex: none; width: 6px; height: 6px; border-radius: 1.5px; }
+.barra.uno { padding: 0 3px; }
+.barra.uno b { white-space: normal; line-height: 11.5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow-wrap: normal; word-break: break-word; font-size: 10px; }
+.barra.uno .sq { display: none; }
+.barra.uno { box-shadow: inset 0 -3px 0 var(--st, transparent); }
+.barra.a { border-top-left-radius: 5px; border-bottom-left-radius: 5px; }
+.barra.b { border-top-right-radius: 5px; border-bottom-right-radius: 5px; }
+.barra.dec { background: transparent; box-shadow: inset 0 0 0 1px var(--c); color: var(--c); }
+.barra .sq { flex: none; width: 8px; height: 8px; border-radius: 2px; box-shadow: 0 0 0 1px #0b0f0d; }
 .altri { font: 600 9px/1 var(--mono); color: var(--gray); padding-left: 6px; margin-top: auto; }
 
 
@@ -355,6 +357,13 @@ function info(e) {
   const resto = String(e.titolo).split(" · ").slice(1).join(" · ");
   return resto || String(e.luogo || "").split(",")[0];
 }
+/** scritta leggibile sulla barra piena: scura sui colori chiari, bianca sugli scuri */
+function contrasto(c) {
+  const m = String(c).match(/^#([0-9a-f]{6})/i);
+  if (!m) return "#0b0f0d";
+  const n = parseInt(m[1], 16), l = (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255;
+  return l > 0.55 ? "#0b0f0d" : "#ffffff";
+}
 const iso = (x) => `${x.getFullYear()}-${pad(x.getMonth() + 1)}-${pad(x.getDate())}`;
 const GGL = ["L", "M", "M", "G", "V", "S", "D"];
 
@@ -394,7 +403,8 @@ function vistaCal() {
       const lungo = p.c1 > p.c0, inf = viaggio ? "" : info(e);
       const testo = viaggio ? "Viaggio" : lungo && inf ? `${corto(az)} · ${inf}` : corto(az);
       const apre = e.data >= g0, chiude = (e.fine || e.data) <= g6;
-      barre += `<span class="barra${apre ? " a" : ""}${chiude ? " b" : ""}${lungo ? "" : " uno"}" style="--c:${colore(d, az)};left:calc(${p.c0} * 100% / 7 + 2px);width:calc(${p.c1 - p.c0 + 1} * 100% / 7 - 4px);top:calc(24px + ${p.l} * 27px)">${st ? `<i class="sq ${st}"></i>` : ""}<b>${esc(testo)}</b></span>`;
+      const cc = colore(d, az);
+      barre += `<span class="barra${apre ? " a" : ""}${chiude ? " b" : ""}${lungo ? "" : " uno"}" style="--c:${cc};--tc:${contrasto(cc)};${!lungo && st && st !== "viaggio" ? `--st:var(--${({ in_calendario: "green", richiesta: "amber", mancante: "red" })[st]});` : ""}left:calc(${p.c0} * 100% / 7 + 2px);width:calc(${p.c1 - p.c0 + 1} * 100% / 7 - 4px);top:calc(24px + ${p.l} * 27px)">${st ? `<i class="sq ${st}"></i>` : ""}<b>${esc(testo)}</b></span>`;
     }
     const righe = Math.max(1, Math.min(3, corsie.length));
     h += `<div class="sett" style="--alt:${30 + righe * 27}px">`;
@@ -528,7 +538,7 @@ function disegna() {
 
 // ---------------------------------------------------------------- caricamento
 /** versione della pagina, scritta dal Mac quando la carica su GitHub */
-const PAGINA = "7.5.3";
+const PAGINA = "7.6.0";
 
 /** silenzioso = controllo automatico: niente rotellina, ridisegna solo se è cambiato qualcosa */
 async function carica(silenzioso) {
